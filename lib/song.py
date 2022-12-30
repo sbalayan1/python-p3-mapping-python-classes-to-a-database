@@ -9,6 +9,7 @@ class Song:
         self.album = album
 
 
+
     #to map our class to our database table, we need a method that creates a table. This method will be a class method because it's the responsibility of the class itself to create a table that holds all of the songs, not the instance.
 
     #To "map" our class to a database table, we will create a table with the same name as our class and give that table column names that match the instance attributes of the class. 
@@ -39,3 +40,22 @@ class Song:
         CURSOR.execute(sql, (self.name, self.album))
 
         #to pass in our name and albums, we use bound parameters. The ? characters act as placeholders. Then when we invoke the execute method, the method will take the arguments passed in and apply them to the question marks. 
+
+        #once the new record is saved to the database, we need to make sure to assign its new ID in the database to the instance's ID attribute. 
+        self.id = CURSOR.execute("SELECT last_insert_rowid() FROM songs").fetchone()[0]
+
+        #now, when we check the id attribute of a new instance, we should see that instance's id. 
+
+        # Key process to understand
+        #     1. instantiate a new class
+        #     2. insert the instance's information into the database
+        #     3. use the id of the new row and assign that id to the instance's id attribute. 
+
+
+    #this classmethod consolidates everything we did above into a single method. That way we don't have to instantiate a class, THEN save the new instance to our database. 
+    @classmethod
+    def create(cls, name, album):
+        song = cls(name, album)
+        song.save()
+        return song
+
